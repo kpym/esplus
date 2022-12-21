@@ -19,6 +19,8 @@ go install github.com/kpym/esplus@latest
 
 ### template
 
+If there is a single parameter it is passed as a string, else the parameters are passed as array of strings.
+
 The following espanso trigger will replace `!lo` with the clipboard content in lowercase.
 
 ```yaml
@@ -36,6 +38,35 @@ The following espanso trigger will replace `!lo` with the clipboard content in l
             - "[[.|lower]]"
             - "{{clipboard}}"
 ```
+
+The following espanso trigger will replace `!snippet` with the `snippet.txt` file content used as a template. 
+
+```yaml
+  - trigger: "!snippet"
+    replace: "{{output}}"
+    vars:
+      - name: "ask"
+        type: form
+        params:
+          layout: "Name [[name]], Age [[age]]"
+      - name: output
+        type: script
+        params:
+          args:
+            - esplus
+            - template
+            - "full/path/to/snippet.txt"
+            - "{{ask.name}}"
+            - "{{ask.age}}"
+```
+
+The file `snippet.txt` could looks like this:
+
+```txt
+The name is {{index . 0}} and the age is {{index . 1}}.
+```
+
+If the file is not found, it is interpreted as a template string, so probably it will be returned as is.
 
 ### run
 

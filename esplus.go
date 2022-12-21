@@ -19,14 +19,26 @@ var version string = "dev"
 // If only one arg is given, execute the template with it as string value.
 // If more than one arg is given, execute the template with them as []string value.
 // The [sprig](github.com/Masterminds/sprig) functionsare available.
-// The delimiters are set to [[ and ]], so that they don't conflict with espanso's delimiters.
+// First check if the arg[0] is a file, if so, read it and use it as template (with {{ and }} as delimiters).
+// If not, consider it as template string. The delimiters are set to [[ and ]], so that they don't conflict with espanso's delimiters.
 func cmdTemplate(args []string) (err error) {
-	// args = os.Args[2:] = <template> <args>
+	// args = os.Args[2:] = <file|template> <args>
 	if len(args) == 0 {
 		return nil
 	}
-	// compile the template
-	tmpl, err := template.New("tmpl").Delims("[[", "]]").Funcs(sprig.FuncMap()).Parse(args[0])
+	var tmpl *template.Template
+	// check if args[0] is a file
+	if _, err := os.Stat(args[0]); err == nil {
+		// args[0] is a file, read it
+		content, err := os.ReadFile(args[0])
+		if err != nil {
+			return err
+		}
+		tmpl, err = template.New("tmpl").Funcs(sprig.FuncMap()).Parse(string(content))
+	} else {
+		// compile the template
+		tmpl, err = template.New("tmpl").Delims("[[", "]]").Funcs(sprig.FuncMap()).Parse(args[0])
+	}
 	if err != nil {
 		return err
 	}
@@ -89,14 +101,18 @@ Version: ` + version + `
 Usage: esplus <command> <args>
 
 Commands:
-	template <template> <args> : execute a template with args (using [[ and ]] as delimiters)
+	template <file> <args> : if file exists, use it as template with args (using {{ and }} as delimiters)
+	template <template string> <args> : execute a template with args (using [[ and ]] as delimiters)
 	run [milliseconds] <cmd> <args> : run a command (with delay) without waiting for it to finish
 
 Examples:
 	esplus template 'Hello [[.|upper]]' 'World'
 	esplus template 'Hello [[range .]][[.|upper|printf "%s\n"]][[end]]' 'World' 'and' 'Earth'
-	esplus template '[[index . 0 | title]] [[index .1 | upper]]' 'Hello' 'World'
+	esplus template 'file.template.txt' 'World'
 	esplus run 200 code .
+
+Project repository:
+	https://github.com/kpym/esplus
 `
 
 func main() {
