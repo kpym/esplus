@@ -3,8 +3,8 @@
 A cli helper tool for [espanso](https://espanso.org/).
 
 It has two commands:
-- `template` that allows you to use golang templates as espanso variables
-- `run` that allows you to run a command without waiting for it to finish (returns empty string)
+- `template` that allows you to use golang templates as espanso variables,
+- `run` that allows you to run a command without waiting for it to finish (returns empty string).
 
 ## Installation
 
@@ -39,7 +39,10 @@ The following espanso trigger will replace `!lo` with the clipboard content in l
 
 ### run
 
-The following espanso trigger will open the espanso config folder in vscode. It will wait for 210 ms, the time for espanso to remove `!edit`.
+The following espanso trigger will :
+- immediately return an empty string,
+- wait for 210 ms, the time for espanso to remove `!edit` (replace it with the empty string),
+- then open the espanso config folder in vscode.
 
 ```yaml
   - trigger: "!edit"
@@ -54,5 +57,6 @@ The following espanso trigger will open the espanso config folder in vscode. It 
             - "210"
             - code
             - '%CONFIG%'
-
 ```
+
+**NOTE:** I hope this tool to become usless one day (see [espanso#1449](https://github.com/espanso/espanso/discussions/1449) and [espanso#1415](https://github.com/espanso/espanso/discussions/1415)).
