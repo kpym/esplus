@@ -34,9 +34,10 @@ func cmdTemplate(args []string) (err error) {
 		if err != nil {
 			return err
 		}
+		// the file content is used as template (with {{ and }} as delimiters)
 		tmpl, err = template.New("tmpl").Funcs(sprig.FuncMap()).Parse(string(content))
 	} else {
-		// compile the template
+		// arg[0] is not a file, consider it as template string (with [[ and ]] as delimiters
 		tmpl, err = template.New("tmpl").Delims("[[", "]]").Funcs(sprig.FuncMap()).Parse(args[0])
 	}
 	if err != nil {
