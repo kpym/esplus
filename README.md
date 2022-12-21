@@ -1,4 +1,4 @@
-# esplus
+# [esplus](https://github.com/kpym/esplus)
 
 A cli helper tool for [espanso](https://espanso.org/).
 
@@ -90,4 +90,11 @@ The following espanso trigger will :
             - '%CONFIG%'
 ```
 
-**NOTE:** I hope this tool to become usless one day (see [espanso#1449](https://github.com/espanso/espanso/discussions/1449) and [espanso#1415](https://github.com/espanso/espanso/discussions/1415)).
+
+## Note 
+
+I hope this tool to become usless one day (see [espanso#1449](https://github.com/espanso/espanso/discussions/1449) and [espanso#1415](https://github.com/espanso/espanso/discussions/1415)).
+
+## License
+
+[MIT](LICENSE) License
