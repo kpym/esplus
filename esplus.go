@@ -4,8 +4,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/BurntSushi/toml"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"text/template"
 	"time"
@@ -70,7 +72,7 @@ func cmdWait(args []string) (err error) {
 		return nil
 	}
 	// run the command (without release)
-	c := exec.Command(args[0], args[1:]...)
+	c := exec.Command(alias(args[0]), args[1:]...)
 	return c.Start()
 }
 
@@ -83,12 +85,15 @@ func cmdRun(args []string) error {
 		return nil
 	}
 	var c *exec.Cmd
-	_, err := strconv.Atoi(args[2])
+	_, err := strconv.Atoi(args[0])
 	if err != nil { // no wait, execute : <cmd> <args>
-		c = exec.Command(args[2], args[3:]...)
+		c = exec.Command(alias(args[0]), args[1:]...)
+		c.Stdout = os.Stdout
+		c.Stderr = os.Stderr
 	} else { // execute esplus wait <milliseconds> <cmd> <args>
-		args[1] = "wait"
-		c = exec.Command(args[0], args[1:]...)
+		// prepend 'wait' to args
+		args = append([]string{"wait"}, args...)
+		c = exec.Command(os.Args[0], args...)
 	}
 	if err := c.Start(); err != nil {
 		return err
@@ -115,6 +120,42 @@ Examples:
 Project repository:
 	https://github.com/kpym/esplus
 `
+var conf struct {
+	// the config file is a yaml file with the following structure
+	// aliases: a map of program aliases
+	//   short_name: full program path
+	Aliases map[string]string
+}
+
+func alias(s string) string {
+	if path, ok := conf.Aliases[s]; ok {
+		return path
+	}
+	return s
+}
+
+func init() {
+	// search for .config/esplus/config.yaml fine in the home directory
+	home, _ := os.UserHomeDir()
+	// parse the config file
+	configFile := filepath.Join(home, ".config", "esplus", "config.toml")
+	if _, err := os.Stat(configFile); err != nil {
+		// config file does not exist
+		return
+	}
+	// read the file exists
+	content, err := os.ReadFile(configFile)
+	if err != nil {
+		fmt.Printf("Error reading config file %s: %s\n", configFile, err)
+		os.Exit(1)
+	}
+	// parse the toml file
+	err = toml.Unmarshal(content, &conf)
+	if err != nil {
+		fmt.Printf("Error parsing config file %s: %s\n", configFile, err)
+		os.Exit(1)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -129,7 +170,7 @@ func main() {
 	case "wait":
 		err = cmdWait(os.Args[2:])
 	case "run":
-		err = cmdRun(os.Args)
+		err = cmdRun(os.Args[2:])
 	default:
 		err = fmt.Errorf("unknown command %s", os.Args[1])
 	}

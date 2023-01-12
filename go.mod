@@ -2,7 +2,10 @@ module github.com/kpym/esplus
 
 go 1.19
 
-require github.com/Masterminds/sprig/v3 v3.2.3
+require (
+	github.com/BurntSushi/toml v1.2.1
+	github.com/Masterminds/sprig/v3 v3.2.3
+)
 
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect

@@ -3,7 +3,7 @@
 A cli helper tool for [espanso](https://espanso.org/).
 
 It has two commands:
-- `template` that allows you to use golang templates as espanso variables,
+- `template` that allows you to use [golang templates](https://pkg.go.dev/text/template) as espanso variables,
 - `run` that allows you to run a command without waiting for it to finish (returns empty string).
 
 ## Installation
@@ -19,7 +19,10 @@ go install github.com/kpym/esplus@latest
 
 ### template
 
+The templates are executed with the [text/template](https://pkg.go.dev/text/template) golang package. The [sprig](github.com/Masterminds/sprig) functions are available.
 If there is a single parameter it is passed as a string, else the parameters are passed as array of strings.
+
+To see how go templates work, you can check [hashicorp's help](https://developer.hashicorp.com/nomad/tutorials/templates/go-template-syntax).
 
 The following espanso trigger will replace `!lo` with the clipboard content in lowercase.
 
@@ -90,6 +93,15 @@ The following espanso trigger will :
             - '%CONFIG%'
 ```
 
+## Configuration
+
+The file `~/.config/esplus/config.toml` (if it exists) is used to configure `esplus`. For now, it is only used to provide aliases to some commands. The reasons is that under MacOS `espanso` runs scripts with some minimal PATH, so programs that are in the path could not be found. The aliases are used to provide the full path to that programs. For example, the following `config.toml` file will allow to use `code` and `subl` as aliases for `Visual Studio Code` and `Sublime Text`:
+
+```toml
+[aliases]
+code = "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+subl = "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl"
+```
 
 ## Note 
 
