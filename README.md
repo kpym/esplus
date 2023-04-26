@@ -17,6 +17,31 @@ go install github.com/kpym/esplus@latest
 
 ## Usage
 
+### help
+
+When you run `esplus`, it displays the following help message
+
+```
+> esplus
+esplus is a helper cli for espanso.
+Version: 0.3.1
+Usage: esplus <command> <args>
+
+Commands:
+  template <file> <args> : if file exists, use it as template with args (using {{ and }} as delimiters)
+  template <template string> <args> : execute a template with args (using [[ and ]] as delimiters)
+  run [milliseconds] <cmd> <args> : run a command (with delay) without waiting for it to finish
+
+Examples:
+  esplus template 'Hello [[.|upper]]' 'World'
+  esplus template 'Hello [[range .]][[.|upper|printf "%s\n"]][[end]]' 'World' 'and' 'Earth'
+  esplus template 'file.template.txt' 'World'
+  esplus run 200 code .
+
+Project repository:
+  https://github.com/kpym/esplus
+```
+
 ### template
 
 The templates are executed with the [text/template](https://pkg.go.dev/text/template) golang package. The [sprig](github.com/Masterminds/sprig) functions are available.
@@ -42,7 +67,7 @@ The following espanso trigger will replace `!lo` with the clipboard content in l
             - "{{clipboard}}"
 ```
 
-The following espanso trigger will replace `!snippet` with the `snippet.txt` file content used as a template. 
+The following espanso trigger will replace `!snippet` with the `snippet.txt` file content used as a template.
 
 ```yaml
   - trigger: "!snippet"
@@ -103,7 +128,7 @@ code = "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
 subl = "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl"
 ```
 
-## Note 
+## Note
 
 I hope this tool to become usless one day (see [espanso#1449](https://github.com/espanso/espanso/discussions/1449) and [espanso#1415](https://github.com/espanso/espanso/discussions/1415)).
 
