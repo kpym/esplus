@@ -4,15 +4,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/BurntSushi/toml"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"text/template"
 	"time"
 
+	"github.com/BurntSushi/toml"
+
 	"github.com/Masterminds/sprig/v3"
+	"github.com/atotto/clipboard"
 )
 
 var version string = "dev"
@@ -102,6 +105,26 @@ func cmdRun(args []string) error {
 	return nil
 }
 
+// cmdClipIn is called by 'esplus clip <cmd> <args>'.
+// It runs <cmd> <args> with the clipboard content as input.
+func cmdClipIn(args []string) error {
+	// args = os.Args[2:] = <cmd> <args>
+	if len(args) == 0 {
+		return nil
+	}
+	// get the clipboard content
+	clip, err := clipboard.ReadAll()
+	if err != nil {
+		return err
+	}
+	buf := strings.NewReader(clip)
+	c := exec.Command(alias(args[0]), args[1:]...)
+	c.Stdin = buf
+	c.Stdout = os.Stdout
+	c.Stderr = nil
+	return c.Run()
+}
+
 var help string = `esplus is a helper cli for espanso. 
 Version: ` + version + `
 Usage: esplus <command> <args>
@@ -110,12 +133,14 @@ Commands:
 	template <file> <args> : if file exists, use it as template with args (using {{ and }} as delimiters)
 	template <template string> <args> : execute a template with args (using [[ and ]] as delimiters)
 	run [milliseconds] <cmd> <args> : run a command (with delay) without waiting for it to finish
+	clipin <cmd> <args> : run a command with the clipboard content as input
 
 Examples:
 	esplus template 'Hello [[.|upper]]' 'World'
 	esplus template 'Hello [[range .]][[.|upper|printf "%s\n"]][[end]]' 'World' 'and' 'Earth'
 	esplus template 'file.template.txt' 'World'
 	esplus run 200 code .
+	esplus clipin html2md
 
 Project repository:
 	https://github.com/kpym/esplus
@@ -171,6 +196,8 @@ func main() {
 		err = cmdWait(os.Args[2:])
 	case "run":
 		err = cmdRun(os.Args[2:])
+	case "clipin":
+		err = cmdClipIn(os.Args[2:])
 	default:
 		err = fmt.Errorf("unknown command %s", os.Args[1])
 	}

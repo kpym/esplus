@@ -2,9 +2,10 @@
 
 A cli helper tool for [espanso](https://espanso.org/).
 
-It has two commands:
+It has three commands:
 - `template` that allows you to use [golang templates](https://pkg.go.dev/text/template) as espanso variables,
 - `run` that allows you to run a command without waiting for it to finish (returns empty string).
+- `clipin` that allows you to run a command with the clipboard content as input.
 
 ## Installation
 
@@ -24,22 +25,24 @@ When you run `esplus`, it displays the following help message
 ```
 > esplus
 esplus is a helper cli for espanso.
-Version: 0.3.1
+Version: 0.4.0
 Usage: esplus <command> <args>
 
 Commands:
-  template <file> <args> : if file exists, use it as template with args (using {{ and }} as delimiters)
-  template <template string> <args> : execute a template with args (using [[ and ]] as delimiters)
-  run [milliseconds] <cmd> <args> : run a command (with delay) without waiting for it to finish
+    template <file> <args> : if file exists, use it as template with args (using {{ and }} as delimiters)
+    template <template string> <args> : execute a template with args (using [[ and ]] as delimiters)
+    run [milliseconds] <cmd> <args> : run a command (with delay) without waiting for it to finish
+    clipin <cmd> <args> : run a command with the clipboard content as input
 
 Examples:
-  esplus template 'Hello [[.|upper]]' 'World'
-  esplus template 'Hello [[range .]][[.|upper|printf "%s\n"]][[end]]' 'World' 'and' 'Earth'
-  esplus template 'file.template.txt' 'World'
-  esplus run 200 code .
+    esplus template 'Hello [[.|upper]]' 'World'
+    esplus template 'Hello [[range .]][[.|upper|printf "%s\n"]][[end]]' 'World' 'and' 'Earth'
+    esplus template 'file.template.txt' 'World'
+    esplus run 200 code .
+    esplus clipin html2md
 
 Project repository:
-  https://github.com/kpym/esplus
+    https://github.com/kpym/esplus
 ```
 
 ### template
@@ -116,6 +119,25 @@ The following espanso trigger will :
             - "210"
             - code
             - '%CONFIG%'
+```
+
+### clipin
+
+Clipin exists because there are somme issues with the clipboard content in espanso. One is the clipboard truncation, the other is related to the encoding of the clipboard content. The `clipin` command allows you to run a command with the clipboard content as utf-8 input.
+
+The following espanso trigger will run the `html2md` command with the clipboard content as input.
+
+```yaml
+  - trigger: "!html2md"
+    replace: "{{output}}"
+    vars:
+      - name: output
+        type: script
+        params:
+          args:
+            - esplus
+            - clipin
+            - html2md
 ```
 
 ## Configuration

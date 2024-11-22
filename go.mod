@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/Masterminds/sprig/v3 v3.2.3
+	github.com/atotto/clipboard v0.1.4
 )
 
 require (
