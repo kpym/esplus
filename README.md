@@ -5,7 +5,7 @@ A cli helper tool for [espanso](https://espanso.org/).
 It has three commands:
 - `template` that allows you to use [golang templates](https://pkg.go.dev/text/template) as espanso variables,
 - `run` that allows you to run a command without waiting for it to finish (returns empty string).
-- `clipin` that allows you to run a command with the clipboard content as input.
+- `clipin` that allows you to run a command or template with the clipboard content as input.
 
 ## Installation
 
@@ -25,7 +25,7 @@ When you run `esplus`, it displays the following help message
 ```
 > esplus
 esplus is a helper cli for espanso.
-Version: 0.4.0
+Version: 0.5.0
 Usage: esplus <command> <args>
 
 Commands:
@@ -33,6 +33,7 @@ Commands:
     template <template string> <args> : execute a template with args (using [[ and ]] as delimiters)
     run [milliseconds] <cmd> <args> : run a command (with delay) without waiting for it to finish
     clipin <cmd> <args> : run a command with the clipboard content as input
+    clipin template <args> : execute a template with the clipboard content as last arg
 
 Examples:
     esplus template 'Hello [[.|upper]]' 'World'
@@ -40,6 +41,7 @@ Examples:
     esplus template 'file.template.txt' 'World'
     esplus run 200 code .
     esplus clipin html2md
+    esplus clipin template 'Clipboard in uppercase: [[.|upper]]'
 
 Project repository:
     https://github.com/kpym/esplus

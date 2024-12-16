@@ -117,6 +117,10 @@ func cmdClipIn(args []string) error {
 	if err != nil {
 		return err
 	}
+	if args[0] == "template" {
+		args = append(args[1:], clip)
+		return cmdTemplate(args)
+	}
 	buf := strings.NewReader(clip)
 	c := exec.Command(alias(args[0]), args[1:]...)
 	c.Stdin = buf
@@ -134,6 +138,7 @@ Commands:
 	template <template string> <args> : execute a template with args (using [[ and ]] as delimiters)
 	run [milliseconds] <cmd> <args> : run a command (with delay) without waiting for it to finish
 	clipin <cmd> <args> : run a command with the clipboard content as input
+	clipin template <args> : execute a template with the clipboard content as last arg
 
 Examples:
 	esplus template 'Hello [[.|upper]]' 'World'
@@ -141,6 +146,7 @@ Examples:
 	esplus template 'file.template.txt' 'World'
 	esplus run 200 code .
 	esplus clipin html2md
+	esplus clipin template 'Clipboard in uppercase: [[.|upper]]'
 
 Project repository:
 	https://github.com/kpym/esplus
