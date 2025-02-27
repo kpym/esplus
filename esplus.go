@@ -33,9 +33,10 @@ func cmdTemplate(args []string) (err error) {
 	}
 	var tmpl *template.Template
 	// check if args[0] is a file
-	if _, err := os.Stat(args[0]); err == nil {
+	if _, fe := os.Stat(args[0]); fe == nil {
 		// args[0] is a file, read it
-		content, err := os.ReadFile(args[0])
+		var content []byte
+		content, err = os.ReadFile(args[0])
 		if err != nil {
 			return err
 		}
@@ -83,7 +84,7 @@ func cmdWait(args []string) (err error) {
 // If milliseconds is not given, execute <cmd> <args> without waiting for it to finish.
 // If milliseconds is a number, execute 'esplus wait <milliseconds> <cmd> <args>' without waiting for it to finish.
 func cmdRun(args []string) error {
-	// args = os.Args = <path to esplus> run [milliseconds] <cmd> <args>
+	// // args = os.Args[2:] = [milliseconds] <cmd> <args>
 	if len(args) == 0 {
 		return nil
 	}
@@ -96,7 +97,11 @@ func cmdRun(args []string) error {
 	} else { // execute esplus wait <milliseconds> <cmd> <args>
 		// prepend 'wait' to args
 		args = append([]string{"wait"}, args...)
-		c = exec.Command(os.Args[0], args...)
+		exePath, err := filepath.Abs(os.Args[0])
+		if err != nil {
+			return err
+		}
+		c = exec.Command(exePath, args...)
 	}
 	if err := c.Start(); err != nil {
 		return err
@@ -105,10 +110,11 @@ func cmdRun(args []string) error {
 	return nil
 }
 
-// cmdClipIn is called by 'esplus clip <cmd> <args>'.
-// It runs <cmd> <args> with the clipboard content as input.
+// cmdClipIn is called by 'esplus clip <cmd|template> <args>'.
+// It runs <cmd> <args> with the clipboard content as input
+// or execute a template with the clipboard content as last arg.
 func cmdClipIn(args []string) error {
-	// args = os.Args[2:] = <cmd> <args>
+	// args = os.Args[2:] = <cmd|template> <args>
 	if len(args) == 0 {
 		return nil
 	}
